@@ -7,6 +7,13 @@ def main():
     favorites_contract: VyperContract = boa.load("favorites.vy")
     print(type(favorites_contract))
 
+    starting_favorite_number = favorites_contract.retrieve()
+    print(f"Starting favorite number is: {starting_favorite_number}")
+
+    favorites_contract.store(42)
+    updated_favorite_number = favorites_contract.retrieve()
+    print(f"Updated favorite number is: {updated_favorite_number}")
+
 
 if __name__ == "__main__":
     main()
