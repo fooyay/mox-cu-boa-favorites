@@ -1,14 +1,18 @@
+import os
 import boa  # type: ignore
 from dotenv import load_dotenv
-import os
 from boa.network import NetworkEnv, EthereumRPC  # type: ignore
 from eth_account import Account
+
 
 load_dotenv()
 
 
+MY_CONTRACT = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+
+
 def main():
-    print("Deploying favorites contract...")
+    print("Interacting with existing favorites contract...")
     rpc = os.getenv("RPC_URL")
     env = NetworkEnv(EthereumRPC(rpc))
     boa.set_env(env)
@@ -17,22 +21,15 @@ def main():
     my_account = Account.from_key(anvil_key)
     boa.env.add_account(my_account, force_eoa=True)
 
-    favorites_contract = boa.load("favorites.vy")
+    favorites_deployer = boa.load_partial("favorites.vy")
+    favorites_contract = favorites_deployer.at(MY_CONTRACT)
 
     starting_favorite_number = favorites_contract.retrieve()
-    print(f"Starting favorite number is: {starting_favorite_number}")
+    print(f"Favorite number is: {starting_favorite_number}")
 
-    print("Storing new favorite number: 42")
-    favorites_contract.store(42)
-
+    favorites_contract.store(22)
     updated_favorite_number = favorites_contract.retrieve()
     print(f"Updated favorite number is: {updated_favorite_number}")
-
-    print("Storing a person...")
-    favorites_contract.add_person("Alice", 25)
-
-    person_data = favorites_contract.list_of_people(0)
-    print(f"Person data: {person_data}")
 
 
 if __name__ == "__main__":
